@@ -1,0 +1,79 @@
+loaders:
+- type: python
+  search_path: [..]
+processors:
+- type: filter
+- type: crossref
+renderer:
+  type: mkdocs
+  markdown:
+    source_linker:
+      type: github
+      repo: AMYPAD/NumCu
+      root: ..
+    source_position: before signature
+    source_format: |
+      <span style="float: right; font-size: 75%;">
+      [[view source]]({url})
+      </span>
+  pages:
+  - title: Home
+    name: index
+    source: index.md
+  - title: External Links
+    children:
+    - title: Source Code
+      href: https://github.com/AMYPAD/NumCu
+    - title: Changelog
+      href: https://github.com/AMYPAD/NumCu/releases
+    - title: Issues
+      href: https://github.com/AMYPAD/NumCu/issues?q=
+  - title: Contributing
+    name: contrib
+    source: ../CONTRIBUTING.md
+  - title: Licence
+    name: licence
+    source: licence.md
+  mkdocs_config:
+    site_name: NumCu documentation
+    site_description: 'Numerical CUDA-based Python library'
+    site_url: https://amypad.github.io/NumCu/
+    site_author: Casper da Costa-Luis
+    repo_name: AMYPAD/NumCu
+    repo_url: https://github.com/AMYPAD/NumCu
+    copyright: |
+      &copy; Casper da Costa-Luis <a href="https://github.com/casperdcl">@casperdcl</a> 2022
+
+    extra:
+      analytics:
+        provider: google
+        property: G-8P266FZJFY
+      generator: false
+    theme:
+      name: material
+      favicon: https://github.com/squidfunk/mkdocs-material/raw/master/material/.icons/fontawesome/solid/memory.svg
+      logo: https://github.com/squidfunk/mkdocs-material/raw/master/material/.icons/fontawesome/solid/memory.svg
+      features: [content.tabs.link]
+      palette:
+      - scheme: default
+        primary: orange
+        toggle:
+          icon: material/toggle-switch-off-outline
+          name: Switch to dark mode
+      - scheme: slate
+        primary: blue
+        toggle:
+          icon: material/toggle-switch
+          name: Switch to light mode
+    plugins:
+    - search
+    - minify:
+        minify_js: true
+        minify_html: true
+    markdown_extensions:
+    - admonition
+    - toc:
+        permalink: '#'
+    - pymdownx.superfences
+    - pymdownx.tabbed:
+        alternate_style: true
