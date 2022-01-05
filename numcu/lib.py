@@ -38,13 +38,14 @@ def div(numerator, divisor, default=FLOAT_MAX, output=None, dev_id=0, sync=True)
         res = np.divide(numerator, divisor, out=output)
         res[np.isnan(res)] = default
         return res
+    cu.dev_set(dev_id)
     numerator = cu.asarray(numerator, 'float32')
     divisor = cu.asarray(divisor, 'float32')
     if numerator.shape != divisor.shape:
         raise IndexError(f"{numerator.shape} and {divisor.shape} don't match")
     check_cuvec(output, numerator.shape, 'float32')
     return cu.asarray(
-        ext.div(numerator, divisor, default=default, output=output, dev_id=dev_id, sync=sync,
+        ext.div(numerator, divisor, default=default, output=output, sync=sync,
                 log=log.getEffectiveLevel()))
 
 
@@ -59,13 +60,14 @@ def mul(a, b, output=None, dev_id=0, sync=True):
     """
     if dev_id is False:
         return np.multiply(a, b, out=output)
+    cu.dev_set(dev_id)
     a = cu.asarray(a, 'float32')
     b = cu.asarray(b, 'float32')
     if a.shape != b.shape:
         raise IndexError(f"{a.shape} and {b.shape} don't match")
     check_cuvec(output, a.shape, 'float32')
     return cu.asarray(
-        ext.mul(a, b, output=output, dev_id=dev_id, sync=sync, log=log.getEffectiveLevel()))
+        ext.mul(a, b, output=output, sync=sync, log=log.getEffectiveLevel()))
 
 
 def add(a, b, output=None, dev_id=0, sync=True):
@@ -79,10 +81,11 @@ def add(a, b, output=None, dev_id=0, sync=True):
     """
     if dev_id is False:
         return np.add(a, b, out=output)
+    cu.dev_set(dev_id)
     a = cu.asarray(a, 'float32')
     b = cu.asarray(b, 'float32')
     if a.shape != b.shape:
         raise IndexError(f"{a.shape} and {b.shape} don't match")
     check_cuvec(output, a.shape, 'float32')
     return cu.asarray(
-        ext.add(a, b, output=output, dev_id=dev_id, sync=sync, log=log.getEffectiveLevel()))
+        ext.add(a, b, output=output, sync=sync, log=log.getEffectiveLevel()))

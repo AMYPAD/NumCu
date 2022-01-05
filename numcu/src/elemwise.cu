@@ -1,7 +1,6 @@
 /**
  * Elementwise operations
  */
-#include "cuhelpers.h" // HANDLE_ERROR
 #include "elemwise.h"
 
 #ifndef NUMCU_DISABLE_CUDA
@@ -39,8 +38,7 @@ void d_div(float *dst, const float *src_num, const float *src_div, const size_t 
   dim3 thrds(NUMCU_THREADS, 1, 1);
   dim3 blcks((N + NUMCU_THREADS - 1) / NUMCU_THREADS, 1, 1);
   div<<<blcks, thrds>>>(dst, src_num, src_div, N, zeroDivDefault);
-  HANDLE_ERROR(cudaGetLastError());
-  if (_sync) HANDLE_ERROR(cudaDeviceSynchronize()); // unified memcpy device2host
+  if (_sync) cudaDeviceSynchronize(); // unified memcpy device2host
 #endif
 }
 /// dst = src_a * src_b
@@ -51,8 +49,7 @@ void d_mul(float *dst, const float *src_a, const float *src_b, const size_t N, b
   dim3 thrds(NUMCU_THREADS, 1, 1);
   dim3 blcks((N + NUMCU_THREADS - 1) / NUMCU_THREADS, 1, 1);
   mul<<<blcks, thrds>>>(dst, src_a, src_b, N);
-  HANDLE_ERROR(cudaGetLastError());
-  if (_sync) HANDLE_ERROR(cudaDeviceSynchronize()); // unified memcpy device2host
+  if (_sync) cudaDeviceSynchronize(); // unified memcpy device2host
 #endif
 }
 /// dst = src_a + src_b
@@ -62,8 +59,6 @@ void d_add(float *dst, const float *src_a, const float *src_b, const size_t N, b
   dim3 thrds(NUMCU_THREADS, 1, 1);
   dim3 blcks((N + NUMCU_THREADS - 1) / NUMCU_THREADS, 1, 1);
   add<<<blcks, thrds>>>(dst, src_a, src_b, N);
-  HANDLE_ERROR(cudaGetLastError());
-
-  if (_sync) HANDLE_ERROR(cudaDeviceSynchronize()); // unified memcpy device2host
+  if (_sync) cudaDeviceSynchronize(); // unified memcpy device2host
 #endif
 }

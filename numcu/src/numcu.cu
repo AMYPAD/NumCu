@@ -4,7 +4,6 @@
  * Copyright (2022) Casper da Costa-Luis
  */
 #include "Python.h"
-#include "cuhelpers.h" // HANDLE_PyErr
 #include "elemwise.h"
 #include "numcu.h"
 #include "pycuvec.cuh" // PyCuVec
@@ -14,19 +13,14 @@ static PyObject *img_div(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_div = NULL; // divisor
   PyCuVec<float> *dst = NULL;     // output
   float zeroDivDefault = FLOAT_MAX;
-  int DEVID = 0;
   bool SYNC = true; // whether to ensure deviceToHost copy on return
   int LOG = LOGDEBUG;
 
   // Parse the input tuple
-  static const char *kwds[] = {"num", "div", "default", "output", "dev_id", "sync", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|fOibi", (char **)kwds, &asPyCuVec_f,
-                                   &src_num, &asPyCuVec_f, &src_div, &zeroDivDefault, &dst, &DEVID,
-                                   &SYNC, &LOG))
+  static const char *kwds[] = {"num", "div", "default", "output", "sync", "log", NULL};
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|fObi", (char **)kwds, &asPyCuVec_f,
+                                   &src_num, &asPyCuVec_f, &src_div, &zeroDivDefault, &dst, &SYNC, &LOG))
     return NULL;
-
-  if (LOG <= LOGDEBUG) fprintf(stderr, "d> using device: %d\n", DEVID);
-  if (!HANDLE_PyErr(cudaSetDevice(DEVID))) return NULL;
 
   if (src_num->shape.size() != src_div->shape.size()) {
     PyErr_SetString(PyExc_IndexError, "inputs must have same ndim");
@@ -51,7 +45,7 @@ static PyObject *img_div(PyObject *self, PyObject *args, PyObject *kwargs) {
 
   d_div(dst->vec.data(), src_num->vec.data(), src_div->vec.data(), dst->vec.size(), zeroDivDefault,
         SYNC);
-  if (!HANDLE_PyErr(cudaGetLastError())) return NULL;
+  if (!HANDLE_CUDA_PyErr()) return NULL;
 
   return (PyObject *)dst;
 }
@@ -60,18 +54,14 @@ static PyObject *img_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_a = NULL; // input A
   PyCuVec<float> *src_b = NULL; // input B
   PyCuVec<float> *dst = NULL;   // output
-  int DEVID = 0;
   bool SYNC = true; // whether to ensure deviceToHost copy on return
   int LOG = LOGDEBUG;
 
   // Parse the input tuple
-  static const char *kwds[] = {"a", "b", "output", "dev_id", "sync", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Oibi", (char **)kwds, &asPyCuVec_f, &src_a,
-                                   &asPyCuVec_f, &src_b, &dst, &DEVID, &SYNC, &LOG))
+  static const char *kwds[] = {"a", "b", "output", "sync", "log", NULL};
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Obi", (char **)kwds, &asPyCuVec_f, &src_a,
+                                   &asPyCuVec_f, &src_b, &dst, &SYNC, &LOG))
     return NULL;
-
-  if (LOG <= LOGDEBUG) fprintf(stderr, "d> using device: %d\n", DEVID);
-  if (!HANDLE_PyErr(cudaSetDevice(DEVID))) return NULL;
 
   if (src_a->shape.size() != src_b->shape.size()) {
     PyErr_SetString(PyExc_IndexError, "inputs must have same ndim");
@@ -95,7 +85,7 @@ static PyObject *img_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
   }
 
   d_mul(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size(), SYNC);
-  if (!HANDLE_PyErr(cudaGetLastError())) return NULL;
+  if (!HANDLE_CUDA_PyErr()) return NULL;
 
   return (PyObject *)dst;
 }
@@ -104,18 +94,14 @@ static PyObject *img_add(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_a = NULL; // input A
   PyCuVec<float> *src_b = NULL; // input B
   PyCuVec<float> *dst = NULL;   // output
-  int DEVID = 0;
   bool SYNC = true; // whether to ensure deviceToHost copy on return
   int LOG = LOGDEBUG;
 
   // Parse the input tuple
-  static const char *kwds[] = {"a", "b", "output", "dev_id", "sync", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Oibi", (char **)kwds, &asPyCuVec_f, &src_a,
-                                   &asPyCuVec_f, &src_b, &dst, &DEVID, &SYNC, &LOG))
+  static const char *kwds[] = {"a", "b", "output", "sync", "log", NULL};
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Obi", (char **)kwds, &asPyCuVec_f, &src_a,
+                                   &asPyCuVec_f, &src_b, &dst, &SYNC, &LOG))
     return NULL;
-
-  if (LOG <= LOGDEBUG) fprintf(stderr, "d> using device: %d\n", DEVID);
-  if (!HANDLE_PyErr(cudaSetDevice(DEVID))) return NULL;
 
   if (src_a->shape.size() != src_b->shape.size()) {
     PyErr_SetString(PyExc_IndexError, "inputs must have same ndim");
@@ -139,7 +125,7 @@ static PyObject *img_add(PyObject *self, PyObject *args, PyObject *kwargs) {
   }
 
   d_add(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size(), SYNC);
-  if (!HANDLE_PyErr(cudaGetLastError())) return NULL;
+  if (!HANDLE_CUDA_PyErr()) return NULL;
 
   return (PyObject *)dst;
 }

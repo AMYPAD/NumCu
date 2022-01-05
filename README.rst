@@ -15,7 +15,9 @@ Install
 Requirements:
 
 - Python 3.6 or greater (e.g. via `Anaconda or Miniconda <https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html#anaconda-or-miniconda>`_)
-- `CUDA SDK/Toolkit <https://developer.nvidia.com/cuda-downloads>`_ (including drivers for an NVIDIA GPU)
+- (optional) `CUDA SDK/Toolkit <https://developer.nvidia.com/cuda-downloads>`_ (including drivers for an NVIDIA GPU)
+
+  * note that if the CUDA SDK/Toolkit is installed *after* NumCu, then NumCu must be re-installed to enable CUDA support
 
 .. code:: sh
 
