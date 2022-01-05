@@ -5,9 +5,9 @@ Numerical CUDA-based Python library built on top of [CuVec](https://amypad.githu
 [![Version](https://img.shields.io/pypi/v/o.svg?logo=python&logoColor=white)](https://github.com/AMYPAD/NumCu/releases)
 [![Downloads](https://img.shields.io/pypi/dm/numcu.svg?logo=pypi&logoColor=white&label=PyPI%20downloads)](https://pypi.org/project/numcu)
 [![Py-Versions](https://img.shields.io/pypi/pyversions/numcu.svg?logo=python&logoColor=white)](https://pypi.org/project/numcu)
-[![Licence](https://img.shields.io/pypi/l/numcu.svg?label=licence)](https://github.com/AMYPAD/NumCu/blob/master/LICENCE)
+[![Licence](https://img.shields.io/pypi/l/numcu.svg?label=licence)](https://github.com/AMYPAD/NumCu/blob/main/LICENCE)
 [![Tests](https://img.shields.io/github/workflow/status/AMYPAD/NumCu/Test?logo=GitHub)](https://github.com/AMYPAD/NumCu/actions)
-[![Coverage](https://codecov.io/gh/AMYPAD/NumCu/branch/master/graph/badge.svg)](https://codecov.io/gh/AMYPAD/NumCu)
+[![Coverage](https://codecov.io/gh/AMYPAD/NumCu/branch/main/graph/badge.svg)](https://codecov.io/gh/AMYPAD/NumCu)
 
 ## Install
 

@@ -29,7 +29,7 @@ See `the usage documentation <https://amypad.github.io/NumCu/#usage>`_.
 Contributing
 ~~~~~~~~~~~~
 
-See `CONTRIBUTING.md <https://github.com/AMYPAD/NumCu/blob/master/CONTRIBUTING.md>`_.
+See `CONTRIBUTING.md <https://github.com/AMYPAD/NumCu/blob/main/CONTRIBUTING.md>`_.
 
 Licence
 ~~~~~~~
@@ -42,12 +42,12 @@ Copyright 2022
 - `Contributors <https://github.com/AMYPAD/numcu/graphs/contributors>`__
 
 .. |Licence| image:: https://img.shields.io/pypi/l/numcu.svg?label=licence
-   :target: https://github.com/AMYPAD/NumCu/blob/master/LICENCE
+   :target: https://github.com/AMYPAD/NumCu/blob/main/LICENCE
 .. |Tests| image:: https://img.shields.io/github/workflow/status/AMYPAD/NumCu/Test?logo=GitHub
    :target: https://github.com/AMYPAD/NumCu/actions
 .. |Downloads| image:: https://img.shields.io/pypi/dm/numcu.svg?logo=pypi&logoColor=white&label=PyPI%20downloads
    :target: https://pypi.org/project/numcu
-.. |Coverage| image:: https://codecov.io/gh/AMYPAD/NumCu/branch/master/graph/badge.svg
+.. |Coverage| image:: https://codecov.io/gh/AMYPAD/NumCu/branch/main/graph/badge.svg
    :target: https://codecov.io/gh/AMYPAD/NumCu
 .. |Version| image:: https://img.shields.io/pypi/v/numcu.svg?logo=python&logoColor=white
    :target: https://github.com/AMYPAD/NumCu/releases
