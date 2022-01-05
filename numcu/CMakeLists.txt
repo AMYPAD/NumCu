@@ -4,7 +4,7 @@ if("${NUMCU_BUILD_VERSION}" STREQUAL "")
 endif()
 project(numcu LANGUAGES C CXX VERSION "${NUMCU_BUILD_VERSION}")
 
-option(CUVEC_CUDA_OPTIONAL "Make CUDA optional rather than forced" ON)
+option(NUMCU_CUDA_OPTIONAL "Make CUDA optional rather than forced" ON)
 
 cmake_policy(PUSH)
 cmake_policy(SET CMP0074 NEW)  # <PackageName>_ROOT hints for find_package

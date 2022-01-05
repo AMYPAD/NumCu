@@ -5,9 +5,9 @@
  */
 #include "Python.h"
 #include "cuhelpers.h" // HANDLE_PyErr
+#include "elemwise.h"
 #include "numcu.h"
 #include "pycuvec.cuh" // PyCuVec
-#include "elemwise.h"
 
 static PyObject *img_div(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_num = NULL; // numerator
