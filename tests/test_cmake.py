@@ -1,6 +1,11 @@
 import numcu as nc
 
 
+def test_includes():
+    assert nc.include_path.is_dir()
+    assert {i.name for i in nc.include_path.iterdir()} == {'cuhelpers.h', 'elemwise.h', 'numcu.h'}
+
+
 def test_cmake_prefix():
     assert nc.cmake_prefix.is_dir()
     assert {i.name

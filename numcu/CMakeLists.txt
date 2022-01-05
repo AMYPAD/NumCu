@@ -43,6 +43,8 @@ else()
 endif()
 cmake_policy(POP)
 
+add_compile_definitions(PY_SSIZE_T_CLEAN)
+
 message(STATUS "CUDA architectures: ${CMAKE_CUDA_ARCHITECTURES}")
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)

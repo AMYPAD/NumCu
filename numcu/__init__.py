@@ -20,7 +20,7 @@ __all__ = [
     'dev_sync', 'copy', 'asarray',
     'zeros', 'ones', 'zeros_like', 'ones_like',
     # numerical
-    'div'] # yapf: disable
+    'add', 'div', 'mul'] # yapf: disable
 
 try:          # py<3.9
     import importlib_resources as resources
@@ -35,7 +35,7 @@ except ImportError as err: # pragma: no cover
 else:
     from cuvec import asarray, copy, ones, ones_like, zeros, zeros_like
 
-    from .lib import div
+    from .lib import add, div, mul
 
 p = resources.files('numcu').resolve()
 # for C++/CUDA/SWIG includes
