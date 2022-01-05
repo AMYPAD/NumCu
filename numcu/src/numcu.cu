@@ -13,13 +13,12 @@ static PyObject *img_div(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_div = NULL; // divisor
   PyCuVec<float> *dst = NULL;     // output
   float zeroDivDefault = FLOAT_MAX;
-  bool SYNC = true; // whether to ensure deviceToHost copy on return
   int LOG = LOGDEBUG;
 
   // Parse the input tuple
-  static const char *kwds[] = {"num", "div", "default", "output", "sync", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|fObi", (char **)kwds, &asPyCuVec_f,
-                                   &src_num, &asPyCuVec_f, &src_div, &zeroDivDefault, &dst, &SYNC, &LOG))
+  static const char *kwds[] = {"num", "div", "default", "output", "log", NULL};
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|fOi", (char **)kwds, &asPyCuVec_f, &src_num,
+                                   &asPyCuVec_f, &src_div, &zeroDivDefault, &dst, &LOG))
     return NULL;
 
   if (src_num->shape.size() != src_div->shape.size()) {
@@ -43,8 +42,8 @@ static PyObject *img_div(PyObject *self, PyObject *args, PyObject *kwargs) {
     if (!dst) return NULL;
   }
 
-  d_div(dst->vec.data(), src_num->vec.data(), src_div->vec.data(), dst->vec.size(), zeroDivDefault,
-        SYNC);
+  d_div(dst->vec.data(), src_num->vec.data(), src_div->vec.data(), dst->vec.size(),
+        zeroDivDefault);
   if (!HANDLE_CUDA_PyErr()) return NULL;
 
   return (PyObject *)dst;
@@ -54,13 +53,12 @@ static PyObject *img_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_a = NULL; // input A
   PyCuVec<float> *src_b = NULL; // input B
   PyCuVec<float> *dst = NULL;   // output
-  bool SYNC = true; // whether to ensure deviceToHost copy on return
   int LOG = LOGDEBUG;
 
   // Parse the input tuple
-  static const char *kwds[] = {"a", "b", "output", "sync", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Obi", (char **)kwds, &asPyCuVec_f, &src_a,
-                                   &asPyCuVec_f, &src_b, &dst, &SYNC, &LOG))
+  static const char *kwds[] = {"a", "b", "output", "log", NULL};
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Oi", (char **)kwds, &asPyCuVec_f, &src_a,
+                                   &asPyCuVec_f, &src_b, &dst, &LOG))
     return NULL;
 
   if (src_a->shape.size() != src_b->shape.size()) {
@@ -84,7 +82,7 @@ static PyObject *img_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
     if (!dst) return NULL;
   }
 
-  d_mul(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size(), SYNC);
+  d_mul(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
   if (!HANDLE_CUDA_PyErr()) return NULL;
 
   return (PyObject *)dst;
@@ -94,13 +92,12 @@ static PyObject *img_add(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_a = NULL; // input A
   PyCuVec<float> *src_b = NULL; // input B
   PyCuVec<float> *dst = NULL;   // output
-  bool SYNC = true; // whether to ensure deviceToHost copy on return
   int LOG = LOGDEBUG;
 
   // Parse the input tuple
-  static const char *kwds[] = {"a", "b", "output", "sync", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Obi", (char **)kwds, &asPyCuVec_f, &src_a,
-                                   &asPyCuVec_f, &src_b, &dst, &SYNC, &LOG))
+  static const char *kwds[] = {"a", "b", "output", "log", NULL};
+  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Oi", (char **)kwds, &asPyCuVec_f, &src_a,
+                                   &asPyCuVec_f, &src_b, &dst, &LOG))
     return NULL;
 
   if (src_a->shape.size() != src_b->shape.size()) {
@@ -124,7 +121,7 @@ static PyObject *img_add(PyObject *self, PyObject *args, PyObject *kwargs) {
     if (!dst) return NULL;
   }
 
-  d_add(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size(), SYNC);
+  d_add(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
   if (!HANDLE_CUDA_PyErr()) return NULL;
 
   return (PyObject *)dst;

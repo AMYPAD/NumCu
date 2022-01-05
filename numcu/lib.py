@@ -44,9 +44,10 @@ def div(numerator, divisor, default=FLOAT_MAX, output=None, dev_id=0, sync=True)
     if numerator.shape != divisor.shape:
         raise IndexError(f"{numerator.shape} and {divisor.shape} don't match")
     check_cuvec(output, numerator.shape, 'float32')
-    return cu.asarray(
-        ext.div(numerator, divisor, default=default, output=output, sync=sync,
-                log=log.getEffectiveLevel()))
+    res = ext.div(numerator, divisor, default=default, output=output, log=log.getEffectiveLevel())
+    if sync:
+        cu.dev_sync()
+    return cu.asarray(res)
 
 
 def mul(a, b, output=None, dev_id=0, sync=True):
@@ -66,8 +67,10 @@ def mul(a, b, output=None, dev_id=0, sync=True):
     if a.shape != b.shape:
         raise IndexError(f"{a.shape} and {b.shape} don't match")
     check_cuvec(output, a.shape, 'float32')
-    return cu.asarray(
-        ext.mul(a, b, output=output, sync=sync, log=log.getEffectiveLevel()))
+    res = ext.mul(a, b, output=output, log=log.getEffectiveLevel())
+    if sync:
+        cu.dev_sync()
+    return cu.asarray(res)
 
 
 def add(a, b, output=None, dev_id=0, sync=True):
@@ -87,5 +90,7 @@ def add(a, b, output=None, dev_id=0, sync=True):
     if a.shape != b.shape:
         raise IndexError(f"{a.shape} and {b.shape} don't match")
     check_cuvec(output, a.shape, 'float32')
-    return cu.asarray(
-        ext.add(a, b, output=output, sync=sync, log=log.getEffectiveLevel()))
+    res = ext.add(a, b, output=output, log=log.getEffectiveLevel())
+    if sync:
+        cu.dev_sync()
+    return cu.asarray(res)
