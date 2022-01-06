@@ -44,9 +44,7 @@ static PyObject *img_div(PyObject *self, PyObject *args, PyObject *kwargs) {
 
   d_div(dst->vec.data(), src_num->vec.data(), src_div->vec.data(), dst->vec.size(),
         zeroDivDefault);
-  if (!HANDLE_CUDA_PyErr()) return NULL;
-
-  return (PyObject *)dst;
+  return CUDA_PyErr() ? NULL : (PyObject *)dst;
 }
 
 static PyObject *img_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
@@ -83,9 +81,7 @@ static PyObject *img_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
   }
 
   d_mul(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
-  if (!HANDLE_CUDA_PyErr()) return NULL;
-
-  return (PyObject *)dst;
+  return CUDA_PyErr() ? NULL : (PyObject *)dst;
 }
 
 static PyObject *img_add(PyObject *self, PyObject *args, PyObject *kwargs) {
@@ -122,9 +118,7 @@ static PyObject *img_add(PyObject *self, PyObject *args, PyObject *kwargs) {
   }
 
   d_add(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
-  if (!HANDLE_CUDA_PyErr()) return NULL;
-
-  return (PyObject *)dst;
+  return CUDA_PyErr() ? NULL : (PyObject *)dst;
 }
 
 static PyMethodDef numcu_methods[] = {
