@@ -8,7 +8,7 @@
 #include "numcu.h"
 #include "pycuvec.cuh" // PyCuVec
 
-static PyObject *img_div(PyObject *self, PyObject *args, PyObject *kwargs) {
+static PyObject *elem_div(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_num = NULL; // numerator
   PyCuVec<float> *src_div = NULL; // divisor
   PyCuVec<float> *dst = NULL;     // output
@@ -47,7 +47,7 @@ static PyObject *img_div(PyObject *self, PyObject *args, PyObject *kwargs) {
   return CUDA_PyErr() ? NULL : (PyObject *)dst;
 }
 
-static PyObject *img_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
+static PyObject *elem_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_a = NULL; // input A
   PyCuVec<float> *src_b = NULL; // input B
   PyCuVec<float> *dst = NULL;   // output
@@ -84,7 +84,7 @@ static PyObject *img_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
   return CUDA_PyErr() ? NULL : (PyObject *)dst;
 }
 
-static PyObject *img_add(PyObject *self, PyObject *args, PyObject *kwargs) {
+static PyObject *elem_add(PyObject *self, PyObject *args, PyObject *kwargs) {
   PyCuVec<float> *src_a = NULL; // input A
   PyCuVec<float> *src_b = NULL; // input B
   PyCuVec<float> *dst = NULL;   // output
@@ -122,9 +122,9 @@ static PyObject *img_add(PyObject *self, PyObject *args, PyObject *kwargs) {
 }
 
 static PyMethodDef numcu_methods[] = {
-    {"div", (PyCFunction)img_div, METH_VARARGS | METH_KEYWORDS, "Elementwise division."},
-    {"mul", (PyCFunction)img_mul, METH_VARARGS | METH_KEYWORDS, "Elementwise multiplication."},
-    {"add", (PyCFunction)img_add, METH_VARARGS | METH_KEYWORDS, "Elementwise addition."},
+    {"div", (PyCFunction)elem_div, METH_VARARGS | METH_KEYWORDS, "Elementwise division."},
+    {"mul", (PyCFunction)elem_mul, METH_VARARGS | METH_KEYWORDS, "Elementwise multiplication."},
+    {"add", (PyCFunction)elem_add, METH_VARARGS | METH_KEYWORDS, "Elementwise addition."},
     {NULL, NULL, 0, NULL} // Sentinel
 };
 
