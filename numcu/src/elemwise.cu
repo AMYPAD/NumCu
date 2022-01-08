@@ -3,7 +3,7 @@
  */
 #include "elemwise.h"
 
-#ifndef NUMCU_DISABLE_CUDA
+#ifndef CUVEC_DISABLE_CUDA
 
 // dst = src_num / src_div
 __global__ void div(float *dst, const float *src_num, const float *src_div, const size_t N,
@@ -25,12 +25,12 @@ __global__ void add(float *dst, const float *src_a, const float *src_b, const si
   dst[i] = src_a[i] + src_b[i];
 }
 
-#endif // NUMCU_DISABLE_CUDA
+#endif // CUVEC_DISABLE_CUDA
 
 /// dst = src_num / src_div
 void d_div(float *dst, const float *src_num, const float *src_div, const size_t N,
            float zeroDivDefault) {
-#ifdef NUMCU_DISABLE_CUDA
+#ifdef CUVEC_DISABLE_CUDA
   for (size_t i = 0; i < N; ++i)
     dst[i] =
         (src_div[i] || zeroDivDefault == FLOAT_MAX) ? src_num[i] / src_div[i] : zeroDivDefault;
@@ -42,7 +42,7 @@ void d_div(float *dst, const float *src_num, const float *src_div, const size_t 
 }
 /// dst = src_a * src_b
 void d_mul(float *dst, const float *src_a, const float *src_b, const size_t N) {
-#ifdef NUMCU_DISABLE_CUDA
+#ifdef CUVEC_DISABLE_CUDA
   for (size_t i = 0; i < N; ++i) dst[i] = src_a[i] * src_b[i];
 #else
   dim3 thrds(NUMCU_THREADS, 1, 1);
@@ -52,7 +52,7 @@ void d_mul(float *dst, const float *src_a, const float *src_b, const size_t N) {
 }
 /// dst = src_a + src_b
 void d_add(float *dst, const float *src_a, const float *src_b, const size_t N) {
-#ifdef NUMCU_DISABLE_CUDA
+#ifdef CUVEC_DISABLE_CUDA
 #else
   dim3 thrds(NUMCU_THREADS, 1, 1);
   dim3 blcks((N + NUMCU_THREADS - 1) / NUMCU_THREADS, 1, 1);
