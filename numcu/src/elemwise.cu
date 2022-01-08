@@ -53,6 +53,7 @@ void d_mul(float *dst, const float *src_a, const float *src_b, const size_t N) {
 /// dst = src_a + src_b
 void d_add(float *dst, const float *src_a, const float *src_b, const size_t N) {
 #ifdef CUVEC_DISABLE_CUDA
+  for (size_t i = 0; i < N; ++i) dst[i] = src_a[i] + src_b[i];
 #else
   dim3 thrds(NUMCU_THREADS, 1, 1);
   dim3 blcks((N + NUMCU_THREADS - 1) / NUMCU_THREADS, 1, 1);
