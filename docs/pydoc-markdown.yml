@@ -20,6 +20,9 @@ renderer:
   - title: Home
     name: index
     source: index.md
+  - title: Python Reference
+    name: ref-py
+    contents: [numcu.*]
   - title: External Links
     children:
     - title: Source Code
