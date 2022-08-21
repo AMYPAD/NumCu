@@ -31,6 +31,8 @@ renderer:
       href: https://github.com/AMYPAD/NumCu/releases
     - title: Issues
       href: https://github.com/AMYPAD/NumCu/issues?q=
+    - title: Citation/DOI
+      href: https://doi.org/10.5281/zenodo.7013340
   - title: Contributing
     name: contrib
     source: ../CONTRIBUTING.md

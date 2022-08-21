@@ -1,5 +1,7 @@
 Copyright &copy; [Casper da Costa-Luis](https://github.com/casperdcl) 2022
 
+Citation: [DOI:10.5281/zenodo.7013340](https://doi.org/10.5281/zenodo.7013340)
+
 > Exhibit A - Source Code Form License Notice
 > -------------------------------------------
 >
