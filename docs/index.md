@@ -7,7 +7,7 @@ Numerical CUDA-based Python library built on top of [CuVec](https://amypad.githu
 [![Py-Versions](https://img.shields.io/pypi/pyversions/numcu.svg?logo=python&logoColor=white)](https://pypi.org/project/numcu)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7013340.svg)](https://doi.org/10.5281/zenodo.7013340)
 [![Licence](https://img.shields.io/pypi/l/numcu.svg?label=licence)](https://github.com/AMYPAD/NumCu/blob/main/LICENCE)
-[![Tests](https://img.shields.io/github/workflow/status/AMYPAD/NumCu/Test?logo=GitHub)](https://github.com/AMYPAD/NumCu/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/AMYPAD/NumCu/test.yml?branch=main&logo=GitHub)](https://github.com/AMYPAD/NumCu/actions)
 [![Coverage](https://codecov.io/gh/AMYPAD/NumCu/branch/main/graph/badge.svg)](https://codecov.io/gh/AMYPAD/NumCu)
 
 ## Install
@@ -18,7 +18,7 @@ pip install numcu
 
 Requirements:
 
-- Python 3.6 or greater (e.g. via [Anaconda or Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html#anaconda-or-miniconda) or via `python3-dev`)
+- Python 3.7 or greater (e.g. via [Anaconda or Miniconda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/download.html#anaconda-or-miniconda) or via `python3-dev`)
 - (optional) [CUDA SDK/Toolkit](https://developer.nvidia.com/cuda-downloads) (including drivers for an NVIDIA GPU)
   + note that if the CUDA SDK/Toolkit is installed *after* NumCu, then NumCu must be re-installed to enable CUDA support
 

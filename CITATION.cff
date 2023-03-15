@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using this metadata.
+type: software
+title: 'NumCu: Numerical CUDA-based Python library'
+abstract: Numerical CUDA-based Python library built on CuVec
+license: MPL-2.0
+url: https://amypad.github.io/NumCu
+authors:
+- family-names: da Costa-Luis
+  given-names: Casper O.
+  orcid: https://orcid.org/0000-0002-7211-1557
+  affiliation: "University College London, King's College London"
+identifiers:
+- type: doi
+  value: 10.5281/zenodo.7013340
+keywords: [Python, C, C++, buffer, vector, array, CUDA, CPython, SWIG, extensions, API]
