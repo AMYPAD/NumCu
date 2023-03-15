@@ -38,7 +38,7 @@ Licence
 
 |Licence| |DOI|
 
-Copyright 2022
+Copyright:
 
 - `Casper O. da Costa-Luis <https://github.com/casperdcl>`__ @ University College London/King's College London
 - `Contributors <https://github.com/AMYPAD/numcu/graphs/contributors>`__
@@ -47,7 +47,7 @@ Copyright 2022
    :target: https://doi.org/10.5281/zenodo.7013340
 .. |Licence| image:: https://img.shields.io/pypi/l/numcu.svg?label=licence
    :target: https://github.com/AMYPAD/NumCu/blob/main/LICENCE
-.. |Tests| image:: https://img.shields.io/github/workflow/status/AMYPAD/NumCu/Test?logo=GitHub
+.. |Tests| image:: https://img.shields.io/github/actions/workflow/status/AMYPAD/NumCu/test.yml?branch=main&logo=GitHub
    :target: https://github.com/AMYPAD/NumCu/actions
 .. |Downloads| image:: https://img.shields.io/pypi/dm/numcu.svg?logo=pypi&logoColor=white&label=PyPI%20downloads
    :target: https://pypi.org/project/numcu

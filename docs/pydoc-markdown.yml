@@ -47,7 +47,7 @@ renderer:
     repo_name: AMYPAD/NumCu
     repo_url: https://github.com/AMYPAD/NumCu
     copyright: |
-      &copy; Casper da Costa-Luis <a href="https://github.com/casperdcl">@casperdcl</a> 2022
+      &copy; Casper da Costa-Luis <a href="https://github.com/casperdcl">@casperdcl</a>
     extra_javascript: [js/extra.js]
     extra_css: [css/extra.css]
 
