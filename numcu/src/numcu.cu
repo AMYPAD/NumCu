@@ -35,7 +35,7 @@ static PyObject *elem_div(PyObject *self, PyObject *args, PyObject *kwargs) {
   dst = asPyCuVec(dst);
   if (dst) {
     if (LOG <= LOGDEBUG) fprintf(stderr, "d> using provided output\n");
-    Py_INCREF((PyObject *)dst); // anticipating returning
+    Py_INCREF(dst); // anticipating returning
   } else {
     if (LOG <= LOGDEBUG) fprintf(stderr, "d> creating output image\n");
     dst = PyCuVec_zeros_like(src_num);
@@ -73,7 +73,7 @@ static PyObject *elem_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
   dst = asPyCuVec(dst);
   if (dst) {
     if (LOG <= LOGDEBUG) fprintf(stderr, "d> using provided output\n");
-    Py_INCREF((PyObject *)dst); // anticipating returning
+    Py_INCREF(dst); // anticipating returning
   } else {
     if (LOG <= LOGDEBUG) fprintf(stderr, "d> creating output image\n");
     dst = PyCuVec_zeros_like(src_a);
@@ -110,7 +110,7 @@ static PyObject *elem_add(PyObject *self, PyObject *args, PyObject *kwargs) {
   dst = asPyCuVec(dst);
   if (dst) {
     if (LOG <= LOGDEBUG) fprintf(stderr, "d> using provided output\n");
-    Py_INCREF((PyObject *)dst); // anticipating returning
+    Py_INCREF(dst); // anticipating returning
   } else {
     if (LOG <= LOGDEBUG) fprintf(stderr, "d> creating output image\n");
     dst = PyCuVec_zeros_like(src_a);
