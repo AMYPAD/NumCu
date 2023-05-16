@@ -4,7 +4,7 @@
  * Copyright (2022) Casper da Costa-Luis
  */
 #include "Python.h"
-#include "elemwise.h"
+#include "elemwise.h" // div, mul, add
 #include "numcu.h"
 #include "pycuvec.cuh" // PyCuVec
 
@@ -42,8 +42,7 @@ static PyObject *elem_div(PyObject *self, PyObject *args, PyObject *kwargs) {
     if (!dst) return NULL;
   }
 
-  d_div(dst->vec.data(), src_num->vec.data(), src_div->vec.data(), dst->vec.size(),
-        zeroDivDefault);
+  div(dst->vec.data(), src_num->vec.data(), src_div->vec.data(), dst->vec.size(), zeroDivDefault);
   return CUDA_PyErr() ? NULL : (PyObject *)dst;
 }
 
@@ -80,7 +79,7 @@ static PyObject *elem_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
     if (!dst) return NULL;
   }
 
-  d_mul(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
+  mul(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
   return CUDA_PyErr() ? NULL : (PyObject *)dst;
 }
 
@@ -117,7 +116,7 @@ static PyObject *elem_add(PyObject *self, PyObject *args, PyObject *kwargs) {
     if (!dst) return NULL;
   }
 
-  d_add(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
+  add(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
   return CUDA_PyErr() ? NULL : (PyObject *)dst;
 }
 
