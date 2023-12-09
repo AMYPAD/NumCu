@@ -2,18 +2,15 @@
 __pycache__/
 
 # build
-/MANIFEST.in
-/*.egg*/
 *.so
-/numcu/cmake/
 /numcu/_dist_ver.py
-/build/
+/numcu/cmake/
+/numcu-*.dist-info/
 /dist/
-/_skbuild/
-/_cmake_test_compile/
 /docs/build/
 
 # Unit test / coverage reports
 /.coverage*
 /coverage.xml
 /.pytest_cache/
+/.mypy_cache/

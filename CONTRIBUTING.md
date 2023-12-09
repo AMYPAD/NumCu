@@ -4,16 +4,21 @@ Install in "development/editable" mode including dev/test dependencies:
 
 ```sh
 git clone https://github.com/AMYPAD/NumCu && cd NumCu
-export SETUPTOOLS_ENABLE_FEATURES=legacy-editable
-pip install -e .[dev]
-```
 
-Alternatively, if `cmake` and a generator (such as `make` or `ninja`) are
-available, then `setup.py build` and `develop` can be explicitly called;
-optionally with extra `cmake` and generator arguments:
+# `pip install -e .[dev]` won't work due to https://github.com/scikit-build/scikit-build-core/issues/114
+# work-around:
+# 1. install dependencies (one-off)
+pip install toml
+python -c 'import toml; c=toml.load("pyproject.toml")
+print("\0".join(c["build-system"]["requires"] + c["project"]["dependencies"] + c["project"]["optional-dependencies"]["dev"]), end="")' \
+| xargs -0 pip install -U ninja cmake
 
-```sh
-python setup.py build develop easy_install numcu[dev] -- -DCUVEC_DEBUG:BOOL=ON -- -j8
+# 2. delete build artefacts, (re)build & install in-place with debug info
+git clean -Xdf
+pip install --no-build-isolation --no-deps -t . -U -v . \
+  -Ccmake.define.CUVEC_DEBUG=1
+  -Ccmake.define.CMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wno-missing-field-initializers -Wno-unused-parameter -Wno-cast-function-type"
+git restore numcu/src # undo deletion of sources
 ```
 
 Once installed in development/editable mode, tests may be run using:

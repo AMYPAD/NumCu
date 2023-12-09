@@ -1,15 +1,19 @@
-cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
-if("${NUMCU_BUILD_VERSION}" STREQUAL "")
-  set(NUMCU_BUILD_VERSION 0 CACHE STRING "version" FORCE)
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
+if(NOT DEFINED SKBUILD_PROJECT_VERSION)
+  set(SKBUILD_PROJECT_VERSION 0 CACHE STRING "version" FORCE)
 endif()
-project(numcu LANGUAGES C CXX VERSION "${NUMCU_BUILD_VERSION}")
+string(REGEX REPLACE [[([0-9]+)\.([0-9]+)\.([0-9]+).*]] [[\1.\2.\3]] SKBUILD_PROJECT_VERSION "${SKBUILD_PROJECT_VERSION}")
+project(numcu LANGUAGES C CXX VERSION "${SKBUILD_PROJECT_VERSION}")
 
 option(NUMCU_CUDA_OPTIONAL "Make CUDA optional rather than forced" ON)
 
 cmake_policy(PUSH)
 cmake_policy(SET CMP0074 NEW)  # <PackageName>_ROOT hints for find_package
+if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
+  set(CMAKE_CUDA_ARCHITECTURES native CACHE STRING "CUDA arch" FORCE)
+endif()
 cmake_policy(SET CMP0104 NEW)  # CMAKE_CUDA_ARCHITECTURES
-find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
 if(NOT NUMCU_CUDA_OPTIONAL)
   find_package(CUDAToolkit REQUIRED)
   enable_language(CUDA)
@@ -27,7 +31,7 @@ else()
   endif()
 endif()
 execute_process(
-  COMMAND "${Python3_EXECUTABLE}" -c "import cuvec; print(cuvec.include_path)"
+  COMMAND "${Python_EXECUTABLE}" -c "import cuvec; print(cuvec.include_path)"
   OUTPUT_VARIABLE CUVEC_INCLUDE_DIRS
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 if("${CUVEC_INCLUDE_DIRS}" STREQUAL "")
@@ -35,18 +39,12 @@ if("${CUVEC_INCLUDE_DIRS}" STREQUAL "")
 else()
   message(STATUS "Found cuvec includes: ${CUVEC_INCLUDE_DIRS}")
 endif()
-if(SKBUILD)
-  find_package(PythonExtensions REQUIRED)
-  set(LIB_TYPE "MODULE")
-else()
-  set(LIB_TYPE "SHARED")
-endif()
 cmake_policy(POP)
 
 add_compile_definitions(PY_SSIZE_T_CLEAN)
 
 message(STATUS "CUDA architectures: ${CMAKE_CUDA_ARCHITECTURES}")
-if("${CMAKE_BUILD_TYPE}" STREQUAL "")
+if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
@@ -57,7 +55,7 @@ if(CUVEC_DEBUG)
 endif(CUVEC_DEBUG)
 message(STATUS "CuVec debugging: ${CUVEC_DEBUG}")
 
-if("${NUMCU_THREADS}" STREQUAL "")
+if(NOT DEFINED NUMCU_THREADS)
   set(NUMCU_THREADS 1024 CACHE STRING
     "Maximum number of CUDA threads per block (should be less than cudaDeviceProp::maxThreadsDim)" FORCE)
 endif()
@@ -69,28 +67,27 @@ install(DIRECTORY "${${CMAKE_PROJECT_NAME}_INCLUDE_DIRS}" DESTINATION ${CMAKE_PR
 # main project
 
 file(GLOB SRC LIST_DIRECTORIES false "src/*.cu")
-include_directories(${Python3_INCLUDE_DIRS})
+include_directories(${Python_INCLUDE_DIRS})
 include_directories(${CUVEC_INCLUDE_DIRS})
 
-add_library(${PROJECT_NAME} SHARED ${SRC})
+if(SKBUILD)
+  python_add_library(${PROJECT_NAME} MODULE WITH_SOABI ${SRC})
+else()
+  add_library(${PROJECT_NAME} SHARED ${SRC})
+endif()
 add_library(AMYPAD::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${${CMAKE_PROJECT_NAME}_INCLUDE_DIRS}>"
   "$<INSTALL_INTERFACE:${CMAKE_PROJECT_NAME}/include>")
 if(CUDAToolkit_FOUND)
-  target_link_libraries(${PROJECT_NAME} ${Python3_LIBRARIES} CUDA::cudart_static)
+  target_link_libraries(${PROJECT_NAME} PRIVATE CUDA::cudart_static)
 else()
   set_source_files_properties(${SRC} PROPERTIES LANGUAGE CXX)
-  target_link_libraries(${PROJECT_NAME} ${Python3_LIBRARIES})
 endif()
 
-if(SKBUILD)
-  python_extension_module(${PROJECT_NAME})
-endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
   CXX_STANDARD 11
-  #VERSION ${CMAKE_PROJECT_VERSION} SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
-  PREFIX ""  # remove shared lib prefix to make importable
+  VERSION ${CMAKE_PROJECT_VERSION} SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
   INTERFACE_${PROJECT_NAME}_MAJOR_VERSION ${CMAKE_PROJECT_VERSION_MAJOR})
 set_property(TARGET ${PROJECT_NAME} APPEND PROPERTY COMPATIBLE_INTERFACE_STRING ${PROJECT_NAME}_MAJOR_VERSION)
 install(TARGETS ${PROJECT_NAME} EXPORT ${PROJECT_NAME}Targets

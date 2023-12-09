@@ -1,8 +1,15 @@
 [build-system]
-requires = ["setuptools>=42", "wheel", "setuptools_scm[toml]>=3.4",
-            "cuvec>=2.11.0", "miutil[cuda]>=0.4.0",
-            "scikit-build>=0.11.0", "cmake>=3.18", "ninja"]
-build-backend = "setuptools.build_meta"
+requires = ["setuptools_scm>=7", "scikit-build-core[pyproject]>=0.5", "cuvec>=2.11.0"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
+sdist.include = ["numcu/_dist_ver.py"]
+sdist.exclude = ["docs", "tests", ".*"]
+wheel.exclude = ["numcu/src/**"]
+minimum-version = "0.5"
+cmake.minimum-version = "3.24"
+cmake.source-dir = "numcu"
 
 [tool.setuptools_scm]
 write_to = "numcu/_dist_ver.py"
