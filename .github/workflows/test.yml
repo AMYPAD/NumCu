@@ -66,7 +66,7 @@ jobs:
         print("\0".join(c["project"]["dependencies"] + c["project"]["optional-dependencies"]["dev"]), end="")' \
         | xargs -0 pip install
     - run: pytest
-    - uses: codecov/codecov-action@v4
+    - uses: codecov/codecov-action@v5
     - name: compile -Wall
       run: |
         git clean -Xdf
@@ -99,7 +99,7 @@ jobs:
         print("\0".join(c["project"]["dependencies"] + c["project"]["optional-dependencies"]["dev"]), end="")' \
         | xargs -0 pip install
     - run: pytest
-    - uses: codecov/codecov-action@v4
+    - uses: codecov/codecov-action@v5
     - name: compile -Wall
       run: |
         git clean -Xdf
