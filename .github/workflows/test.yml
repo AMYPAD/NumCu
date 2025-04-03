@@ -5,51 +5,26 @@ on:
   schedule: [{cron: '30 23 * * 6'}]  # M H d m w (Sat at 23:30)
   workflow_dispatch:
 jobs:
-  check:
+  clang-format:
     if: github.event_name != 'pull_request' || !contains('OWNER,MEMBER,COLLABORATOR', github.event.pull_request.author_association)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
-    - name: set PYSHA
-      run: echo "PYSHA=$(python -VV | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
-    - uses: actions/cache@v3
-      with:
-        path: ~/.cache/pre-commit
-        key: pre-commit|${{ env.PYSHA }}|${{ hashFiles('.pre-commit-config.yaml') }}
-    - name: dependencies
-      run: |
-        pip install -U pre-commit
-        sudo apt-get install -yqq clang-format
-    - uses: reviewdog/action-setup@v1
-    - if: github.event_name == 'push' || github.event_name == 'pull_request'
-      name: comment
-      run: |
-        if [[ $EVENT == pull_request ]]; then
-          REPORTER=github-pr-review
-        else
-          REPORTER=github-check
-        fi
-        pre-commit run -a todo | reviewdog -efm="%f:%l: %m" -name=TODO -tee -reporter=$REPORTER -filter-mode nofilter
-        pre-commit run -a flake8 | reviewdog -f=pep8 -name=flake8 -tee -reporter=$REPORTER -filter-mode nofilter
-        pre-commit run -a mypy | reviewdog -efm="%f:%l: %m" -name=mypy -tee -reporter=$REPORTER -filter-mode nofilter
-      env:
-        REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        EVENT: ${{ github.event_name }}
-    - run: pre-commit run -a --show-diff-on-failure
+      with: {python-version: '3.x'}
+    - run: sudo apt-get install -yqq clang-format
+    - uses: pre-commit/action@v3.0.1
+      with: {extra_args: --all-files clang-format}
   test:
     if: github.event_name != 'pull_request' || !contains('OWNER,MEMBER,COLLABORATOR', github.event.pull_request.author_association)
     name: py${{ matrix.python }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-${{ matrix.python == 3.7 && '22.04' || 'latest' }}
     strategy:
       matrix:
         python: [3.7, 3.12]
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      with: {fetch-depth: 0}
     - uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
@@ -66,7 +41,7 @@ jobs:
         print("\0".join(c["project"]["dependencies"] + c["project"]["optional-dependencies"]["dev"]), end="")' \
         | xargs -0 pip install
     - run: pytest
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v5
     - name: compile -Wall
       run: |
         git clean -Xdf
@@ -82,8 +57,7 @@ jobs:
         python: [3.7, 3.12]
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      with: {fetch-depth: 0}
     - name: Run setup-python
       run: setup-python -p${{ matrix.python }}
     - name: pip install -U -e .[dev]
@@ -99,7 +73,7 @@ jobs:
         print("\0".join(c["project"]["dependencies"] + c["project"]["optional-dependencies"]["dev"]), end="")' \
         | xargs -0 pip install
     - run: pytest
-    - uses: codecov/codecov-action@v3
+    - uses: codecov/codecov-action@v5
     - name: compile -Wall
       run: |
         git clean -Xdf
@@ -111,12 +85,10 @@ jobs:
       run: setup-python -p${{ matrix.python }} -Dr
       if: ${{ always() }}
   deploy:
-    needs: [check, test, cuda]
+    needs: [clang-format, test, cuda]
     name: PyPI Deploy
     environment: pypi
-    permissions:
-      contents: write
-      id-token: write
+    permissions: {contents: write, id-token: write}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -124,15 +96,12 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.GH_TOKEN || github.token }}
     - uses: actions/setup-python@v5
-      with:
-        python-version: '3.x'
+      with: {python-version: '3.x'}
     - id: dist
       uses: casperdcl/deploy-pypi@v2
       with:
         build: -s
-        upload: false
-    - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-      uses: pypa/gh-action-pypi-publish@release/v1
+        upload: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags') }}
     - if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
       name: Release
       run: |
