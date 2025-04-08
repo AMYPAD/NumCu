@@ -17,8 +17,10 @@ def get_namespace(*xs, default=cu):
     but handles `CuVec`s pretending to be NumPy arrays.
     """
     for a in xs:
-        if hasattr(a, 'cuvec') and (ns := getattr(a, '__array_namespace__', None)) is not None:
-            return ns()
+        if hasattr(a, 'cuvec'):
+            from importlib import import_module
+
+            return import_module(a.__module__)
     return default # backwards compatibility
 
 
