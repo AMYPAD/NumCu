@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools_scm>=7", "scikit-build-core[pyproject]>=0.5", "cuvec>=2.11.0"]
+requires = ["setuptools_scm>=7", "scikit-build-core[pyproject]>=0.5", "cuvec>=2.11.0", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
@@ -27,7 +27,7 @@ authors = [{name = "Casper da Costa-Luis", email = "casper.dcl@physics.org"}]
 description = "Numerical CUDA-based Python library built on CuVec"
 readme = "README.rst"
 requires-python = ">=3.7"
-keywords = ["Python", "C", "C++", "buffer", "vector", "array", "CUDA", "CPython", "SWIG", "extensions", "API"]
+keywords = ["Python", "C", "C++", "buffer", "vector", "array", "CUDA", "CPython", "pybind11", "extensions", "API"]
 license = {text = "MPL-2.0"}
 classifiers = [
     "Development Status :: 5 - Production/Stable",
