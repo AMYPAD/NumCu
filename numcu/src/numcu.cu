@@ -4,7 +4,6 @@
  * Copyright (2022) Casper da Costa-Luis
  */
 #include "elemwise.h"          // div, mul, add
-#include "numcu.h"             // LOGDEBUG
 #include <pybind11/pybind11.h> // pybind11
 #include <pycuvec.cuh>         // CUDA_PyErr
 
