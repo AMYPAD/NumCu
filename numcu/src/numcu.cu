@@ -3,137 +3,72 @@
  *
  * Copyright (2022) Casper da Costa-Luis
  */
-#include "Python.h"
-#include "elemwise.h" // div, mul, add
-#include "numcu.h"
-#include "pycuvec.cuh" // PyCuVec
+#include "elemwise.h"          // div, mul, add
+#include "numcu.h"             // LOGDEBUG
+#include <pybind11/pybind11.h> // pybind11
+#include <pycuvec.cuh>         // CUDA_PyErr
 
-static PyObject *elem_div(PyObject *self, PyObject *args, PyObject *kwargs) {
-  PyCuVec<float> *src_num = NULL; // numerator
-  PyCuVec<float> *src_div = NULL; // divisor
-  PyCuVec<float> *dst = NULL;     // output
-  float zeroDivDefault = FLOAT_MAX;
-  int LOG = LOGDEBUG;
+namespace py = pybind11;
 
-  // Parse the input tuple
-  static const char *kwds[] = {"num", "div", "default", "output", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|fOi", (char **)kwds, &asPyCuVec_f, &src_num,
-                                   &asPyCuVec_f, &src_div, &zeroDivDefault, &dst, &LOG))
-    return NULL;
-
-  if (src_num->shape.size() != src_div->shape.size()) {
-    PyErr_SetString(PyExc_IndexError, "inputs must have same ndim");
-    return NULL;
+template <typename T>
+void elem_div(py::buffer num, py::buffer den, py::buffer dst, T zeroDivDefault) {
+  py::buffer_info src_num = num.request(), src_den = den.request(), dst_out = dst.request(true);
+  const std::vector<std::string> types = {src_num.format, src_den.format, dst_out.format};
+  for (auto &type : types) {
+    if (type != py::format_descriptor<T>::format()) throw py::type_error("unexpected type");
   }
-  for (size_t i = 0; i < src_num->shape.size(); i++) {
-    if (src_num->shape[i] != src_div->shape[i]) {
-      PyErr_SetString(PyExc_IndexError, "inputs must have same shape");
-      return NULL;
-    }
+  if (src_num.ndim != src_den.ndim) throw py::index_error("inputs must have same ndim");
+  if (src_num.ndim != dst_out.ndim) throw py::index_error("output must have same ndim");
+  for (size_t i = 0; i < src_num.ndim; i++) {
+    if (src_num.shape[i] != src_den.shape[i]) throw py::index_error("inputs must have same shape");
+    if (src_num.shape[i] != dst_out.shape[i]) throw py::index_error("output must have same shape");
   }
 
-  dst = asPyCuVec(dst);
-  if (dst) {
-    if (LOG <= LOGDEBUG) fprintf(stderr, "d> using provided output\n");
-    Py_INCREF(dst); // anticipating returning
-  } else {
-    if (LOG <= LOGDEBUG) fprintf(stderr, "d> creating output image\n");
-    dst = PyCuVec_zeros_like(src_num);
-    if (!dst) return NULL;
-  }
-
-  div(dst->vec.data(), src_num->vec.data(), src_div->vec.data(), dst->vec.size(), zeroDivDefault);
-  return CUDA_PyErr() ? NULL : (PyObject *)dst;
+  div(static_cast<T *>(dst_out.ptr), static_cast<T *>(src_num.ptr), static_cast<T *>(src_den.ptr),
+      dst_out.size, zeroDivDefault);
+  CUDA_PyErr();
 }
 
-static PyObject *elem_mul(PyObject *self, PyObject *args, PyObject *kwargs) {
-  PyCuVec<float> *src_a = NULL; // input A
-  PyCuVec<float> *src_b = NULL; // input B
-  PyCuVec<float> *dst = NULL;   // output
-  int LOG = LOGDEBUG;
-
-  // Parse the input tuple
-  static const char *kwds[] = {"a", "b", "output", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Oi", (char **)kwds, &asPyCuVec_f, &src_a,
-                                   &asPyCuVec_f, &src_b, &dst, &LOG))
-    return NULL;
-
-  if (src_a->shape.size() != src_b->shape.size()) {
-    PyErr_SetString(PyExc_IndexError, "inputs must have same ndim");
-    return NULL;
+template <typename T> void elem_mul(py::buffer a, py::buffer b, py::buffer dst) {
+  py::buffer_info src_a = a.request(), src_b = b.request(), dst_out = dst.request(true);
+  const std::vector<std::string> types = {src_a.format, src_b.format, dst_out.format};
+  for (auto &type : types) {
+    if (type != py::format_descriptor<T>::format()) throw py::type_error("unexpected type");
   }
-  for (size_t i = 0; i < src_a->shape.size(); i++) {
-    if (src_a->shape[i] != src_b->shape[i]) {
-      PyErr_SetString(PyExc_IndexError, "inputs must have same shape");
-      return NULL;
-    }
+  if (src_a.ndim != src_b.ndim) throw py::index_error("inputs must have same ndim");
+  if (src_a.ndim != dst_out.ndim) throw py::index_error("output must have same ndim");
+  for (size_t i = 0; i < src_a.ndim; i++) {
+    if (src_a.shape[i] != src_b.shape[i]) throw py::index_error("inputs must have same shape");
+    if (src_a.shape[i] != dst_out.shape[i]) throw py::index_error("output must have same shape");
   }
 
-  dst = asPyCuVec(dst);
-  if (dst) {
-    if (LOG <= LOGDEBUG) fprintf(stderr, "d> using provided output\n");
-    Py_INCREF(dst); // anticipating returning
-  } else {
-    if (LOG <= LOGDEBUG) fprintf(stderr, "d> creating output image\n");
-    dst = PyCuVec_zeros_like(src_a);
-    if (!dst) return NULL;
-  }
-
-  mul(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
-  return CUDA_PyErr() ? NULL : (PyObject *)dst;
+  mul(static_cast<T *>(dst_out.ptr), static_cast<T *>(src_a.ptr), static_cast<T *>(src_b.ptr),
+      dst_out.size);
+  CUDA_PyErr();
 }
 
-static PyObject *elem_add(PyObject *self, PyObject *args, PyObject *kwargs) {
-  PyCuVec<float> *src_a = NULL; // input A
-  PyCuVec<float> *src_b = NULL; // input B
-  PyCuVec<float> *dst = NULL;   // output
-  int LOG = LOGDEBUG;
-
-  // Parse the input tuple
-  static const char *kwds[] = {"a", "b", "output", "log", NULL};
-  if (!PyArg_ParseTupleAndKeywords(args, kwargs, "O&O&|Oi", (char **)kwds, &asPyCuVec_f, &src_a,
-                                   &asPyCuVec_f, &src_b, &dst, &LOG))
-    return NULL;
-
-  if (src_a->shape.size() != src_b->shape.size()) {
-    PyErr_SetString(PyExc_IndexError, "inputs must have same ndim");
-    return NULL;
+template <typename T> void elem_add(py::buffer a, py::buffer b, py::buffer dst) {
+  py::buffer_info src_a = a.request(), src_b = b.request(), dst_out = dst.request(true);
+  const std::vector<std::string> types = {src_a.format, src_b.format, dst_out.format};
+  for (auto &type : types) {
+    if (type != py::format_descriptor<T>::format()) throw py::type_error("unexpected type");
   }
-  for (size_t i = 0; i < src_a->shape.size(); i++) {
-    if (src_a->shape[i] != src_b->shape[i]) {
-      PyErr_SetString(PyExc_IndexError, "inputs must have same shape");
-      return NULL;
-    }
+  if (src_a.ndim != src_b.ndim) throw py::index_error("inputs must have same ndim");
+  if (src_a.ndim != dst_out.ndim) throw py::index_error("output must have same ndim");
+  for (size_t i = 0; i < src_a.ndim; i++) {
+    if (src_a.shape[i] != src_b.shape[i]) throw py::index_error("inputs must have same shape");
+    if (src_a.shape[i] != dst_out.shape[i]) throw py::index_error("output must have same shape");
   }
-
-  dst = asPyCuVec(dst);
-  if (dst) {
-    if (LOG <= LOGDEBUG) fprintf(stderr, "d> using provided output\n");
-    Py_INCREF(dst); // anticipating returning
-  } else {
-    if (LOG <= LOGDEBUG) fprintf(stderr, "d> creating output image\n");
-    dst = PyCuVec_zeros_like(src_a);
-    if (!dst) return NULL;
-  }
-
-  add(dst->vec.data(), src_a->vec.data(), src_b->vec.data(), dst->vec.size());
-  return CUDA_PyErr() ? NULL : (PyObject *)dst;
+  add(static_cast<T *>(dst_out.ptr), static_cast<T *>(src_a.ptr), static_cast<T *>(src_b.ptr),
+      dst_out.size);
+  CUDA_PyErr();
 }
 
-static PyMethodDef numcu_methods[] = {
-    {"div", (PyCFunction)elem_div, METH_VARARGS | METH_KEYWORDS, "Elementwise division."},
-    {"mul", (PyCFunction)elem_mul, METH_VARARGS | METH_KEYWORDS, "Elementwise multiplication."},
-    {"add", (PyCFunction)elem_add, METH_VARARGS | METH_KEYWORDS, "Elementwise addition."},
-    {NULL, NULL, 0, NULL} // Sentinel
-};
-
-/** module */
-static struct PyModuleDef numcu = {PyModuleDef_HEAD_INIT,
-                                   "numcu", // module
-                                   "NumCu external module.",
-                                   -1, // module keeps state in global variables
-                                   numcu_methods};
-PyMODINIT_FUNC PyInit_numcu(void) {
-  Py_Initialize();
-  return PyModule_Create(&numcu);
+using namespace pybind11::literals;
+PYBIND11_MODULE(numcu, m) {
+  m.doc() = "NumCu external module.";
+  m.def("div", &elem_div<float>, "Elementwise division.", "numerator"_a, "divisor"_a, "output"_a,
+        "default"_a = FLOAT_MAX);
+  m.def("mul", &elem_mul<float>, "Elementwise multiplication.", "a"_a, "b"_a, "output"_a);
+  m.def("add", &elem_add<float>, "Elementwise addition.", "a"_a, "b"_a, "output"_a);
 }

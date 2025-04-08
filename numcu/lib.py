@@ -11,10 +11,21 @@ log = logging.getLogger(__name__)
 FLOAT_MAX = np.float32(np.inf)
 
 
-def check_cuvec(a, shape, dtype):
+def get_namespace(*xs, default=cu):
+    """
+    Similar to `array_api_compat.get_namespace`,
+    but handles `CuVec`s pretending to be NumPy arrays.
+    """
+    for a in xs:
+        if hasattr(a, 'cuvec') and (ns := getattr(a, '__array_namespace__', None)) is not None:
+            return ns()
+    return default # backwards compatibility
+
+
+def check_cuvec(a, shape, dtype, xp=cu):
     """Asserts that CuVec `a` is of `shape` & `dtype`"""
-    if not isinstance(a, cu.CuVec):
-        raise TypeError(f"must be a {cu.CuVec}")
+    if not isinstance(a, xp.CuVec):
+        raise TypeError(f"must be a {xp.CuVec}")
     elif np.dtype(a.dtype) != np.dtype(dtype):
         raise TypeError(f"dtype must be {dtype}: got {a.dtype}")
     elif a.shape != shape:
@@ -26,9 +37,9 @@ def check_similar(*arrays, allow_none=True):
     arrs = tuple(filter(lambda x: x is not None, arrays))
     if not allow_none and len(arrays) != len(arrs):
         raise TypeError("must not be None")
-    shape, dtype = arrs[0].shape, arrs[0].dtype
+    shape, dtype, xp = arrs[0].shape, arrs[0].dtype, get_namespace(*arrs)
     for a in arrs:
-        check_cuvec(a, shape, dtype)
+        check_cuvec(a, shape, dtype, xp)
 
 
 def div(numerator, divisor, default=FLOAT_MAX, output=None, dev_id=0, sync=True):
@@ -47,12 +58,14 @@ def div(numerator, divisor, default=FLOAT_MAX, output=None, dev_id=0, sync=True)
         res[np.isnan(res)] = default
         return res
     cu.dev_set(dev_id)
-    numerator = cu.asarray(numerator, 'float32')
-    divisor = cu.asarray(divisor, 'float32')
+    xp = get_namespace(numerator, divisor, output)
+    numerator = xp.asarray(numerator, 'float32')
+    divisor = xp.asarray(divisor, 'float32')
+    output = xp.zeros_like(numerator) if output is None else xp.asarray(output, 'float32')
     check_similar(numerator, divisor, output)
-    res = ext.div(numerator, divisor, default=default, output=output, log=log.getEffectiveLevel())
+    ext.div(numerator, divisor, output, default=default)
     if sync: cu.dev_sync()
-    return cu.asarray(res)
+    return output
 
 
 def mul(a, b, output=None, dev_id=0, sync=True):
@@ -67,12 +80,14 @@ def mul(a, b, output=None, dev_id=0, sync=True):
     """
     if dev_id is False: return np.multiply(a, b, out=output)
     cu.dev_set(dev_id)
-    a = cu.asarray(a, 'float32')
-    b = cu.asarray(b, 'float32')
+    xp = get_namespace(a, b, output)
+    a = xp.asarray(a, 'float32')
+    b = xp.asarray(b, 'float32')
+    output = xp.zeros_like(a) if output is None else xp.asarray(output, 'float32')
     check_similar(a, b, output)
-    res = ext.mul(a, b, output=output, log=log.getEffectiveLevel())
+    ext.mul(a, b, output)
     if sync: cu.dev_sync()
-    return cu.asarray(res)
+    return output
 
 
 def add(a, b, output=None, dev_id=0, sync=True):
@@ -87,9 +102,11 @@ def add(a, b, output=None, dev_id=0, sync=True):
     """
     if dev_id is False: return np.add(a, b, out=output)
     cu.dev_set(dev_id)
-    a = cu.asarray(a, 'float32')
-    b = cu.asarray(b, 'float32')
+    xp = get_namespace(a, b, output)
+    a = xp.asarray(a, 'float32')
+    b = xp.asarray(b, 'float32')
+    output = xp.zeros_like(a) if output is None else xp.asarray(output, 'float32')
     check_similar(a, b, output)
-    res = ext.add(a, b, output=output, log=log.getEffectiveLevel())
+    ext.add(a, b, output)
     if sync: cu.dev_sync()
-    return cu.asarray(res)
+    return output
