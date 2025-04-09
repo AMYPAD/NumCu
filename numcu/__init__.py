@@ -38,7 +38,7 @@ else:
     from .lib import add, div, mul
 
 p = resources.files('numcu').resolve()
-# for C++/CUDA/SWIG includes
+# for C++/CUDA/pybind11 includes
 include_path = p / 'include'
 # for use in `cmake -DCMAKE_PREFIX_PATH=...`
 cmake_prefix = p / 'cmake'

@@ -14,6 +14,7 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
 endif()
 cmake_policy(SET CMP0104 NEW)  # CMAKE_CUDA_ARCHITECTURES
 find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
+find_package(pybind11 CONFIG REQUIRED)
 if(NOT NUMCU_CUDA_OPTIONAL)
   find_package(CUDAToolkit REQUIRED)
   enable_language(CUDA)
@@ -70,11 +71,7 @@ file(GLOB SRC LIST_DIRECTORIES false "src/*.cu")
 include_directories(${Python_INCLUDE_DIRS})
 include_directories(${CUVEC_INCLUDE_DIRS})
 
-if(SKBUILD)
-  python_add_library(${PROJECT_NAME} MODULE WITH_SOABI ${SRC})
-else()
-  add_library(${PROJECT_NAME} SHARED ${SRC})
-endif()
+pybind11_add_module(${PROJECT_NAME} MODULE WITH_SOABI ${SRC})
 add_library(AMYPAD::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${${CMAKE_PROJECT_NAME}_INCLUDE_DIRS}>"
