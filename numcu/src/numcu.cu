@@ -14,21 +14,21 @@ void elem_div(py::buffer num, py::buffer den, py::buffer dst, T zeroDivDefault) 
   py::buffer_info src_num = num.request(), src_den = den.request(), dst_out = dst.request(true);
   div(static_cast<T *>(dst_out.ptr), static_cast<T *>(src_num.ptr), static_cast<T *>(src_den.ptr),
       dst_out.size, zeroDivDefault);
-  CUDA_PyErr();
+  if (CUDA_PyErr()) throw std::runtime_error("CUDA kernel");
 }
 
 template <typename T> void elem_mul(py::buffer a, py::buffer b, py::buffer dst) {
   py::buffer_info src_a = a.request(), src_b = b.request(), dst_out = dst.request(true);
   mul(static_cast<T *>(dst_out.ptr), static_cast<T *>(src_a.ptr), static_cast<T *>(src_b.ptr),
       dst_out.size);
-  CUDA_PyErr();
+  if (CUDA_PyErr()) throw std::runtime_error("CUDA kernel");
 }
 
 template <typename T> void elem_add(py::buffer a, py::buffer b, py::buffer dst) {
   py::buffer_info src_a = a.request(), src_b = b.request(), dst_out = dst.request(true);
   add(static_cast<T *>(dst_out.ptr), static_cast<T *>(src_a.ptr), static_cast<T *>(src_b.ptr),
       dst_out.size);
-  CUDA_PyErr();
+  if (CUDA_PyErr()) throw std::runtime_error("CUDA kernel");
 }
 
 using namespace pybind11::literals;
