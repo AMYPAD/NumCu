@@ -2,6 +2,7 @@
  * Elementwise operations
  */
 #include "elemwise.h"
+#include <stdexcept> // std::invalid_argument
 
 #ifndef CUVEC_DISABLE_CUDA
 
@@ -30,33 +31,75 @@ __global__ void knlAdd(float *dst, const float *src_a, const float *src_b, const
 /// dst = src_num / src_div
 void div(float *dst, const float *src_num, const float *src_div, const size_t N,
          float zeroDivDefault) {
-#ifdef CUVEC_DISABLE_CUDA
-  for (size_t i = 0; i < N; ++i)
-    dst[i] =
-        (src_div[i] || zeroDivDefault == FLOAT_MAX) ? src_num[i] / src_div[i] : zeroDivDefault;
-#else
+#ifndef CUVEC_DISABLE_CUDA
+  cudaPointerAttributes attr;
+  cudaPointerGetAttributes(&attr, dst);
   dim3 thrds(NUMCU_THREADS, 1, 1);
   dim3 blcks((N + NUMCU_THREADS - 1) / NUMCU_THREADS, 1, 1);
-  knlDiv<<<blcks, thrds>>>(dst, src_num, src_div, N, zeroDivDefault);
+  switch (attr.type) {
+  case cudaMemoryTypeHost:
+  case cudaMemoryTypeUnregistered:
+#endif
+    for (size_t i = 0; i < N; ++i)
+      dst[i] =
+          (src_div[i] || zeroDivDefault == FLOAT_MAX) ? src_num[i] / src_div[i] : zeroDivDefault;
+#ifndef CUVEC_DISABLE_CUDA
+    break;
+  case cudaMemoryTypeDevice:
+  case cudaMemoryTypeManaged:
+    knlDiv<<<blcks, thrds>>>(dst, src_num, src_div, N, zeroDivDefault);
+    break;
+  default:
+    throw std::invalid_argument("unknown memory type");
+    break;
+  }
 #endif
 }
 /// dst = src_a * src_b
 void mul(float *dst, const float *src_a, const float *src_b, const size_t N) {
-#ifdef CUVEC_DISABLE_CUDA
-  for (size_t i = 0; i < N; ++i) dst[i] = src_a[i] * src_b[i];
-#else
+#ifndef CUVEC_DISABLE_CUDA
+  cudaPointerAttributes attr;
+  cudaPointerGetAttributes(&attr, dst);
   dim3 thrds(NUMCU_THREADS, 1, 1);
   dim3 blcks((N + NUMCU_THREADS - 1) / NUMCU_THREADS, 1, 1);
-  knlMul<<<blcks, thrds>>>(dst, src_a, src_b, N);
+  switch (attr.type) {
+  case cudaMemoryTypeHost:
+  case cudaMemoryTypeUnregistered:
+#endif
+    for (size_t i = 0; i < N; ++i) dst[i] = src_a[i] * src_b[i];
+#ifndef CUVEC_DISABLE_CUDA
+    break;
+  case cudaMemoryTypeDevice:
+  case cudaMemoryTypeManaged:
+    knlMul<<<blcks, thrds>>>(dst, src_a, src_b, N);
+    break;
+  default:
+    throw std::runtime_error("unknown memory type");
+    break;
+  }
 #endif
 }
 /// dst = src_a + src_b
 void add(float *dst, const float *src_a, const float *src_b, const size_t N) {
-#ifdef CUVEC_DISABLE_CUDA
-  for (size_t i = 0; i < N; ++i) dst[i] = src_a[i] + src_b[i];
-#else
+#ifndef CUVEC_DISABLE_CUDA
+  cudaPointerAttributes attr;
+  cudaPointerGetAttributes(&attr, dst);
   dim3 thrds(NUMCU_THREADS, 1, 1);
   dim3 blcks((N + NUMCU_THREADS - 1) / NUMCU_THREADS, 1, 1);
-  knlAdd<<<blcks, thrds>>>(dst, src_a, src_b, N);
+  switch (attr.type) {
+  case cudaMemoryTypeHost:
+  case cudaMemoryTypeUnregistered:
+#endif
+    for (size_t i = 0; i < N; ++i) dst[i] = src_a[i] + src_b[i];
+#ifndef CUVEC_DISABLE_CUDA
+    break;
+  case cudaMemoryTypeDevice:
+  case cudaMemoryTypeManaged:
+    knlAdd<<<blcks, thrds>>>(dst, src_a, src_b, N);
+    break;
+  default:
+    throw std::runtime_error("unknown memory type");
+    break;
+  }
 #endif
 }
