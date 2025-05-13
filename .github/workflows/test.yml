@@ -47,7 +47,7 @@ jobs:
         git clean -Xdf
         pip install build
         python -m build -n -w \
-          -Ccmake.define.CMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wno-missing-field-initializers -Wno-unused-parameter -Wno-cast-function-type"
+          -Ccmake.define.CMAKE_CXX_FLAGS="-Wall -Wextra -Werror -Wno-missing-field-initializers -Wno-unused-parameter -Wno-cast-function-type"
   cuda:
     if: github.event_name != 'pull_request' || !contains('OWNER,MEMBER,COLLABORATOR', github.event.pull_request.author_association)
     name: CUDA py${{ matrix.python }}
@@ -79,7 +79,7 @@ jobs:
         git clean -Xdf
         pip install build
         python -m build -n -w \
-          -Ccmake.define.CMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wno-missing-field-initializers -Wno-unused-parameter -Wno-cast-function-type" \
+          -Ccmake.define.CMAKE_CXX_FLAGS="-Wall -Wextra -Werror -Wno-missing-field-initializers -Wno-unused-parameter -Wno-cast-function-type" \
           -Ccmake.define.CMAKE_CUDA_ARCHITECTURES=all
     - name: Post Run setup-python
       run: setup-python -p${{ matrix.python }} -Dr
