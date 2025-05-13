@@ -27,7 +27,7 @@ authors = [{name = "Casper da Costa-Luis", email = "casper.dcl@physics.org"}]
 description = "Numerical CUDA-based Python library built on CuVec"
 readme = "README.rst"
 requires-python = ">=3.7"
-keywords = ["Python", "C", "C++", "buffer", "vector", "array", "CUDA", "CPython", "pybind11", "extensions", "API"]
+keywords = ["Python", "C", "C++", "buffer", "vector", "array", "CUDA", "CPython", "nanobind", "extensions", "API"]
 license = {text = "MPL-2.0"}
 classifiers = [
     "Development Status :: 5 - Production/Stable",
