@@ -26,7 +26,7 @@ dynamic = ["version"]
 authors = [{name = "Casper da Costa-Luis", email = "casper.dcl@physics.org"}]
 description = "Numerical CUDA-based Python library built on CuVec"
 readme = "README.rst"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 keywords = ["Python", "C", "C++", "buffer", "vector", "array", "CUDA", "CPython", "nanobind", "extensions", "API"]
 license = {text = "MPL-2.0"}
 classifiers = [
@@ -42,7 +42,6 @@ classifiers = [
     "Programming Language :: C",
     "Programming Language :: C++",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
