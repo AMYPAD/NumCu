@@ -17,7 +17,7 @@ print("\0".join(c["build-system"]["requires"] + c["project"]["dependencies"] + c
 git clean -Xdf
 pip install --no-build-isolation --no-deps -t . -U -v . \
   -Ccmake.define.CUVEC_DEBUG=1
-  -Ccmake.define.CMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wno-missing-field-initializers -Wno-unused-parameter -Wno-cast-function-type"
+  -Ccmake.define.CMAKE_CXX_FLAGS="-Wall -Wextra -Werror -Wno-missing-field-initializers -Wno-unused-parameter -Wno-cast-function-type"
 git restore numcu/src # undo deletion of sources
 ```
 

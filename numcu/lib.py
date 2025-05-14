@@ -24,26 +24,6 @@ def get_namespace(*xs, default=cu):
     return default # backwards compatibility
 
 
-def check_cuvec(a, shape, dtype, xp=cu):
-    """Asserts that CuVec `a` is of `shape` & `dtype`"""
-    if not isinstance(a, xp.CuVec):
-        raise TypeError(f"must be a {xp.CuVec}")
-    elif np.dtype(a.dtype) != np.dtype(dtype):
-        raise TypeError(f"dtype must be {dtype}: got {a.dtype}")
-    elif a.shape != shape:
-        raise IndexError(f"shape must be {shape}: got {a.shape}")
-
-
-def check_similar(*arrays, allow_none=True):
-    """Asserts that all arrays are `CuVec`s of the same `shape` & `dtype`"""
-    arrs = tuple(filter(lambda x: x is not None, arrays))
-    if not allow_none and len(arrays) != len(arrs):
-        raise TypeError("must not be None")
-    shape, dtype, xp = arrs[0].shape, arrs[0].dtype, get_namespace(*arrs)
-    for a in arrs:
-        check_cuvec(a, shape, dtype, xp)
-
-
 def div(numerator, divisor, default=FLOAT_MAX, output=None, dev_id=0, sync=True):
     """
     Elementwise `output = numerator / divisor if divisor else default`
@@ -59,12 +39,10 @@ def div(numerator, divisor, default=FLOAT_MAX, output=None, dev_id=0, sync=True)
         res = np.divide(numerator, divisor, out=output)
         res[np.isnan(res)] = default
         return res
+    assert numerator.size == divisor.size
     cu.dev_set(dev_id)
-    xp = get_namespace(numerator, divisor, output)
-    numerator = xp.asarray(numerator, 'float32')
-    divisor = xp.asarray(divisor, 'float32')
-    output = xp.zeros_like(numerator) if output is None else xp.asarray(output, 'float32')
-    check_similar(numerator, divisor, output)
+    if output is None:
+        output = get_namespace(numerator, divisor, output).zeros_like(numerator)
     ext.div(numerator, divisor, output, default=default)
     if sync: cu.dev_sync()
     return output
@@ -81,12 +59,10 @@ def mul(a, b, output=None, dev_id=0, sync=True):
       sync(bool): whether to `cudaDeviceSynchronize()` after GPU operations.
     """
     if dev_id is False: return np.multiply(a, b, out=output)
+    assert a.size == b.size
     cu.dev_set(dev_id)
-    xp = get_namespace(a, b, output)
-    a = xp.asarray(a, 'float32')
-    b = xp.asarray(b, 'float32')
-    output = xp.zeros_like(a) if output is None else xp.asarray(output, 'float32')
-    check_similar(a, b, output)
+    if output is None:
+        output = get_namespace(a, b, output).zeros_like(a)
     ext.mul(a, b, output)
     if sync: cu.dev_sync()
     return output
@@ -103,12 +79,10 @@ def add(a, b, output=None, dev_id=0, sync=True):
       sync(bool): whether to `cudaDeviceSynchronize()` after GPU operations.
     """
     if dev_id is False: return np.add(a, b, out=output)
+    assert a.size == b.size
     cu.dev_set(dev_id)
-    xp = get_namespace(a, b, output)
-    a = xp.asarray(a, 'float32')
-    b = xp.asarray(b, 'float32')
-    output = xp.zeros_like(a) if output is None else xp.asarray(output, 'float32')
-    check_similar(a, b, output)
+    if output is None:
+        output = get_namespace(a, b, output).zeros_like(a)
     ext.add(a, b, output)
     if sync: cu.dev_sync()
     return output
